@@ -6,9 +6,12 @@ import { Mail, MapPin, Phone, Clock, Send, CheckCircle2, ArrowUpRight, MessageSq
 import { InstagramIcon as Instagram } from "@/components/icons/InstagramIcon";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { sendContactEmail } from "@/lib/actions/email.action";
+import { toast } from "sonner";
 
 export default function ContactClient() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -17,10 +20,35 @@ export default function ContactClient() {
     message: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    // In a real app, you'd send the data here
+    setLoading(true);
+    
+    try {
+      const result = await sendContactEmail(formData);
+      
+      if (result.success) {
+        setSubmitted(true);
+        toast.success("Transmission Received", {
+          description: "Our response team has been notified.",
+        });
+      } else {
+        toast.error("Transmission Error", {
+          description: "Please try again or contact us via Instagram.",
+        });
+      }
+    } catch (error) {
+      toast.error("System Failure", {
+        description: "An unexpected error occurred.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -116,8 +144,12 @@ export default function ContactClient() {
                         <label className="text-[10px] font-black text-brand-charcoal/30 uppercase tracking-[0.2em] ml-2">Origin First Name</label>
                         <input 
                           type="text" 
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleChange}
                           required
-                          className="w-full h-16 px-8 rounded-2xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all"
+                          disabled={loading}
+                          className="w-full h-16 px-8 rounded-2xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all disabled:opacity-50"
                           placeholder="ARJUN"
                         />
                       </div>
@@ -125,8 +157,12 @@ export default function ContactClient() {
                         <label className="text-[10px] font-black text-brand-charcoal/30 uppercase tracking-[0.2em] ml-2">Origin Last Name</label>
                         <input 
                           type="text" 
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleChange}
                           required
-                          className="w-full h-16 px-8 rounded-2xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all"
+                          disabled={loading}
+                          className="w-full h-16 px-8 rounded-2xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all disabled:opacity-50"
                           placeholder="M."
                         />
                       </div>
@@ -136,8 +172,12 @@ export default function ContactClient() {
                       <label className="text-[10px] font-black text-brand-charcoal/30 uppercase tracking-[0.2em] ml-2">Communication Email</label>
                       <input 
                         type="email" 
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
                         required
-                        className="w-full h-16 px-8 rounded-2xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all"
+                        disabled={loading}
+                        className="w-full h-16 px-8 rounded-2xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all disabled:opacity-50"
                         placeholder="HELLO@WORLD.COM"
                       />
                     </div>
@@ -145,8 +185,12 @@ export default function ContactClient() {
                     <div className="space-y-3">
                       <label className="text-[10px] font-black text-brand-charcoal/30 uppercase tracking-[0.2em] ml-2">Query Subject</label>
                       <select 
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
                         required
-                        className="w-full h-16 px-8 rounded-2xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all appearance-none"
+                        disabled={loading}
+                        className="w-full h-16 px-8 rounded-2xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all appearance-none disabled:opacity-50"
                       >
                         <option value="">SELECT PROTOCOL...</option>
                         <option value="order">ORDER_TRACKING</option>
@@ -159,15 +203,19 @@ export default function ContactClient() {
                     <div className="space-y-3">
                       <label className="text-[10px] font-black text-brand-charcoal/30 uppercase tracking-[0.2em] ml-2">Full Intel Message</label>
                       <textarea 
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
                         required
+                        disabled={loading}
                         rows={5}
-                        className="w-full px-8 py-6 rounded-3xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all resize-none"
+                        className="w-full px-8 py-6 rounded-3xl bg-brand-cream/50 border border-brand-charcoal/5 text-brand-charcoal font-bold focus:outline-none focus:border-brand-red focus:bg-white transition-all resize-none disabled:opacity-50"
                         placeholder="PROVIDE DETAILS..."
                       />
                     </div>
 
-                    <Button type="submit" className="w-full h-18 bg-brand-red hover:bg-brand-red/90 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-sm shadow-2xl shadow-brand-red/20 transition-all active:scale-95 group">
-                       Initialize Transmission
+                    <Button type="submit" disabled={loading} className="w-full h-18 bg-brand-red hover:bg-brand-red/90 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-sm shadow-2xl shadow-brand-red/20 transition-all active:scale-95 group disabled:opacity-50">
+                       {loading ? "Transmitting..." : "Initialize Transmission"}
                        <Send className="ml-3 w-5 h-5 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </form>
