@@ -36,34 +36,32 @@ export default function AddProductPage() {
     { name: "XXL", stock: 0 }
   ]);
 
-  const isMounted = React.useRef(false);
+  const isLoaded = React.useRef(false);
 
   useEffect(() => {
     getCategories().then(data => {
       setDbCategories(data);
     });
 
-    // Load from sessionStorage on mount
+    // Load from sessionStorage on mount — set isLoaded synchronously
     const savedForm = sessionStorage.getItem("ketchupp_add_product_form");
     const savedSizes = sessionStorage.getItem("ketchupp_add_product_sizes");
     if (savedForm) setFormData(JSON.parse(savedForm));
     if (savedSizes) setSizes(JSON.parse(savedSizes));
-    
-    // Mark as mounted AFTER loading
-    setTimeout(() => {
-      isMounted.current = true;
-    }, 100);
+
+    // Mark as loaded IMMEDIATELY (synchronous, no setTimeout race)
+    isLoaded.current = true;
   }, []);
 
-  // Save to sessionStorage when state changes (ONLY if mounted and loaded)
+  // Save to sessionStorage whenever state changes — only after initial load
   useEffect(() => {
-    if (isMounted.current) {
+    if (isLoaded.current) {
       sessionStorage.setItem("ketchupp_add_product_form", JSON.stringify(formData));
     }
   }, [formData]);
 
   useEffect(() => {
-    if (isMounted.current) {
+    if (isLoaded.current) {
       sessionStorage.setItem("ketchupp_add_product_sizes", JSON.stringify(sizes));
     }
   }, [sizes]);
@@ -239,18 +237,22 @@ export default function AddProductPage() {
                 key={index}
                 value={url}
                 onUpload={(newUrl) => {
-                  const newImages = [...formData.images];
-                  newImages[index] = newUrl;
-                  setFormData({ ...formData, images: newImages });
+                  setFormData(prev => {
+                    const newImages = [...prev.images];
+                    newImages[index] = newUrl;
+                    return { ...prev, images: newImages };
+                  });
                 }}
                 onRemove={() => {
-                  const newImages = formData.images.filter((_, i) => i !== index);
-                  setFormData({ ...formData, images: newImages });
+                  setFormData(prev => ({
+                    ...prev,
+                    images: prev.images.filter((_, i) => i !== index),
+                  }));
                 }}
               />
             ))}
             <CldUpload 
-              onUpload={(url) => setFormData({ ...formData, images: [...formData.images, url] })}
+              onUpload={(url) => setFormData(prev => ({ ...prev, images: [...prev.images, url] }))}
             />
           </div>
           <p className="text-[10px] text-[#8B8580] font-bold uppercase tracking-widest">
