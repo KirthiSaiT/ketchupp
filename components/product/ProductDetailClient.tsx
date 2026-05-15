@@ -290,7 +290,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
 
             {/* Accordions */}
-            <Accordion type="single" collapsible className="space-y-2">
+            <Accordion className="space-y-2">
               <AccordionItem value="desc" className="bg-white rounded-2xl border border-[#DDD8CE] px-5">
                 <AccordionTrigger className="text-sm font-semibold text-[#1A1A1A] hover:no-underline py-4">Description</AccordionTrigger>
                 <AccordionContent className="text-sm text-[#8B8580] pb-4 leading-relaxed whitespace-pre-line">

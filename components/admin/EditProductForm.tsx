@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, Image as ImageIcon, Loader2, Plus } from "lucide-react";
 import { updateProduct } from "@/lib/actions/product.action";
 import { getCategories } from "@/lib/actions/category.action";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import CldUpload from "@/components/admin/CldUpload";
 

@@ -15,6 +15,7 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   price: number;
   comparePrice?: number;
   image: string;
@@ -23,6 +24,8 @@ export interface Product {
   badge?: string | null;
   colors?: string[];
   sizes?: { name: string; stock: number }[];
+  fabric?: string;
+  care?: string;
   rating?: number;
   reviewCount?: number;
   createdAt?: string | Date;
