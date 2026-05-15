@@ -119,7 +119,7 @@ export default function CollectionClient({ categorySlug, initialSearch }: Collec
                 Archival Collection
               </span>
               <h1 className="text-7xl lg:text-9xl font-black text-white leading-none tracking-tighter uppercase">
-                 {categoryTitle.split(' ').map((word, i) => (
+                 {categoryTitle.split(' ').map((word: string, i: number) => (
                     <span key={i} className="block">
                       {word === "Archive" ? <span className="text-brand-red italic font-serif">{word}</span> : word}
                     </span>
