@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export interface Product {
+  _id?: string;
   id: string;
   name: string;
   slug: string;
@@ -34,7 +35,8 @@ export default function ProductCard({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState<string | null>(
     product.sizes?.find(s => s.stock > 0)?.name ?? null
   );
-  const allImages = product.images?.length ? product.images : [product.image];
+  const allImages = product.images?.length ? product.images : (product.image ? [product.image] : ["/images/placeholder.webp"]);
+  const mainImage = allImages[0];
   const [activeImg, setActiveImg] = useState(0);
 
   const discount = product.comparePrice
@@ -47,18 +49,24 @@ export default function ProductCard({ product }: { product: Product }) {
       toast.error("Please select a size");
       return;
     }
-    addItem({
-      id: product.id,
+    const selectedSizeData = product.sizes?.find(s => s.name === selectedSize);
+    
+    const success = addItem({
+      id: product._id || product.id,
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: mainImage,
       size: selectedSize ?? "Free Size",
       color: product.colors?.[0] ?? "",
       quantity: 1,
       slug: product.slug,
+      maxStock: selectedSizeData?.stock ?? 99,
     });
-    toast.success(`${product.name} added to bag!`);
-    setQuickOpen(false);
+
+    if (success) {
+      toast.success(`${product.name} added to bag!`);
+      setQuickOpen(false);
+    }
   }
 
   return (
@@ -68,10 +76,12 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="relative aspect-[3/4.5] rounded-[2rem] overflow-hidden bg-brand-charcoal/5 cursor-pointer">
           <Link href={`/products/${product.slug}`}>
             <Image
-              src={product.image}
+              src={mainImage}
               alt={product.name}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover transition-transform duration-1000 group-hover:scale-110"
+              quality={85}
             />
           </Link>
 
@@ -132,9 +142,9 @@ export default function ProductCard({ product }: { product: Product }) {
       <Dialog open={quickOpen} onOpenChange={setQuickOpen}>
         <DialogContent
           showCloseButton={false}
-          className="w-[95vw] max-w-5xl p-0 overflow-hidden border-none bg-transparent rounded-[2rem] shadow-2xl gap-0"
+          className="w-[95vw] max-w-5xl sm:max-w-5xl md:max-w-5xl lg:max-w-5xl p-0 overflow-hidden border-none bg-transparent rounded-[2rem] shadow-2xl gap-0"
         >
-          <div className="flex flex-col lg:flex-row max-h-[90vh] rounded-[2rem] overflow-hidden">
+          <div className="flex flex-col lg:flex-row max-h-[90vh] rounded-[2rem] overflow-hidden bg-[#FAF7F2]">
 
             {/* Left: Image Panel */}
             <div className="relative lg:w-[55%] bg-[#111] flex-shrink-0 min-h-[300px] lg:min-h-[580px]">
@@ -143,8 +153,10 @@ export default function ProductCard({ product }: { product: Product }) {
                   src={allImages[activeImg]}
                   alt={product.name}
                   fill
+                  sizes="(max-width: 1024px) 100vw, 55vw"
                   className="object-cover transition-opacity duration-300"
                   priority
+                  quality={90}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent pointer-events-none" />
               </div>
@@ -207,7 +219,14 @@ export default function ProductCard({ product }: { product: Product }) {
                           : "border-white/30 opacity-60 hover:opacity-100"
                       )}
                     >
-                      <Image src={img} alt={`View ${i + 1}`} fill className="object-cover" />
+                      <Image 
+                        src={img} 
+                        alt={`View ${i + 1}`} 
+                        fill 
+                        sizes="48px"
+                        className="object-cover" 
+                        quality={50}
+                      />
                     </button>
                   ))}
                 </div>

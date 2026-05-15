@@ -2,20 +2,21 @@
 import { connectDB } from "../db";
 import { Order } from "../models/Order";
 
-import { sendMockOrderConfirmation } from "../utils/email";
+import { sendOrderConfirmationEmail } from "./email.action";
 
 export async function createOrder(orderData: any) {
   try {
     await connectDB();
     const order = await Order.create(orderData);
     
-    // Trigger mock email log
-    await sendMockOrderConfirmation({
+    // Trigger real email via Resend
+    const emailRes = await sendOrderConfirmationEmail({
       orderId: order._id.toString(),
-      customerName: order.shippingAddress.name,
-      customerEmail: order.userEmail,
+      customerName: order.shipping.name,
+      customerEmail: orderData.userEmail || order.shipping.email || "customer@example.com",
       total: order.total,
-      items: order.items
+      items: order.items,
+      shippingAddress: order.shipping
     });
 
     return { success: true, orderId: order._id.toString() };

@@ -60,7 +60,7 @@ export default function Footer() {
           {/* Newsletter Col */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest text-[#FFD60A] mb-6">Stay Connected</h4>
-            <p className="text-xs text-[#8B8580] mb-4">Join our list for early access to drops.</p>
+            <p className="text-xs text-[#8B8580] mb-4 font-medium italic">Season 2 Drop Coming Soon.</p>
             <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
               <input 
                 type="email" 

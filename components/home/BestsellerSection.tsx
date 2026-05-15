@@ -41,7 +41,9 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
             src={product.image}
             alt={product.name}
             fill
+            sizes="320px"
             className={`object-cover transition-transform duration-700 ease-out ${isHovered ? "scale-110" : "scale-100"}`}
+            quality={80}
           />
           
           {/* Glass Badges */}

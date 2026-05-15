@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, ShoppingBag, Package, LayoutGrid, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Package, LayoutGrid, ArrowLeft, Settings } from "lucide-react";
 
 export const metadata = {
   title: "Admin Dashboard | Ketchupp",
@@ -42,9 +42,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Package className="w-5 h-5 text-[#8B8580]" />
             <span className="font-semibold text-sm text-[#DDD8CE]">Manage Products</span>
           </Link>
-          <Link href="/admin/categories" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors">
-            <LayoutGrid className="w-5 h-5 text-[#8B8580]" />
-            <span className="font-semibold text-sm text-[#DDD8CE]">Dynamic Categories</span>
+          <Link href="/admin/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors">
+            <Settings className="w-5 h-5 text-[#8B8580]" />
+            <span className="font-semibold text-sm text-[#DDD8CE]">Store Settings</span>
           </Link>
         </nav>
 

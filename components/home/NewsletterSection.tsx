@@ -33,12 +33,12 @@ export default function NewsletterSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tighter">
-              JOIN THE <br className="sm:hidden" /> <span className="text-brand-yellow italic font-serif">FAMILY</span>
+            <h2 className="text-4xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tighter uppercase">
+              STAY <span className="text-brand-yellow italic font-serif">CONNECTED</span>
             </h2>
             <p className="text-white/80 text-lg mb-12 max-w-xl mx-auto font-medium">
-              Get 10% off your first order and exclusive access to the Archive drops. 
-              No spam, just premium content.
+              Join the inner circle for the <span className="text-white font-black">SEASON 2</span> drop. 
+              Be the first to secure the next phase of the archive.
             </p>
 
             {!isSubmitted ? (
@@ -65,10 +65,10 @@ export default function NewsletterSection() {
                 className="inline-flex items-center gap-4 px-10 py-6 rounded-3xl bg-brand-yellow text-brand-charcoal"
               >
                  <CheckCircle2 className="w-8 h-8" />
-                 <div className="text-left">
-                    <p className="text-lg font-black leading-none mb-1 uppercase tracking-tight">You're in!</p>
-                    <p className="text-xs font-bold opacity-60 uppercase tracking-widest">Check your inbox for the 10% code.</p>
-                 </div>
+                  <div className="text-left">
+                     <p className="text-lg font-black leading-none mb-1 uppercase tracking-tight">Welcome to the inner circle.</p>
+                     <p className="text-xs font-bold opacity-60 uppercase tracking-widest">You'll be notified the moment Season 2 drops.</p>
+                  </div>
               </motion.div>
             )}
           </motion.div>

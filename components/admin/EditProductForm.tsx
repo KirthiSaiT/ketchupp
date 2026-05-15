@@ -27,8 +27,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
     images: (product.images || []) as string[],
     isBestseller: product.isBestseller || false,
     isNewProduct: product.isNewProduct || false,
-    fabric: product.fabric || "",
-    care: product.care || "",
+    isUpcoming: product.isUpcoming || false,
   });
 
   const [sizes, setSizes] = useState(product.sizes || [
@@ -70,8 +69,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
       sizes: sizes,
       isBestseller: formData.isBestseller,
       isNewProduct: formData.isNewProduct,
-      fabric: formData.fabric,
-      care: formData.care,
+      isUpcoming: formData.isUpcoming,
     };
 
     const res = await updateProduct(product._id, formattedData);
@@ -127,21 +125,16 @@ export default function EditProductForm({ product }: EditProductFormProps) {
                   name="category" 
                   value={formData.category} 
                   onChange={handleChange} 
-                  className="flex-1 px-4 py-2.5 bg-[#FAF7F2] rounded-xl border border-[#DDD8CE] text-sm focus:outline-none focus:border-[#C1121F]"
+                  className="w-full px-4 py-2.5 bg-[#FAF7F2] rounded-xl border border-[#DDD8CE] text-sm focus:outline-none focus:border-[#C1121F]"
                 >
                   {dbCategories.map(cat => (
                     <option key={cat._id} value={cat.slug}>{cat.name}</option>
                   ))}
                   {dbCategories.length === 0 && <option value={formData.category}>{formData.category}</option>}
                 </select>
-                <Link href="/admin/categories">
-                  <Button type="button" variant="outline" className="rounded-xl px-3 border-[#DDD8CE]">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </Link>
               </div>
             </div>
-            <div className="flex items-end gap-6 pb-2">
+            <div className="flex flex-wrap items-end gap-4 pb-2">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input type="checkbox" name="isBestseller" checked={formData.isBestseller} onChange={handleChange} className="w-4 h-4 rounded text-[#C1121F] border-[#DDD8CE] ring-offset-0 focus:ring-0" />
                 <span className="text-xs font-bold text-[#1A1A1A] group-hover:text-[#C1121F] transition-colors uppercase tracking-widest">Bestseller</span>
@@ -149,6 +142,10 @@ export default function EditProductForm({ product }: EditProductFormProps) {
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input type="checkbox" name="isNewProduct" checked={formData.isNewProduct} onChange={handleChange} className="w-4 h-4 rounded text-[#C1121F] border-[#DDD8CE] ring-offset-0 focus:ring-0" />
                 <span className="text-xs font-bold text-[#1A1A1A] group-hover:text-[#C1121F] transition-colors uppercase tracking-widest">New</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input type="checkbox" name="isUpcoming" checked={formData.isUpcoming} onChange={handleChange} className="w-4 h-4 rounded text-[#C1121F] border-[#DDD8CE] ring-offset-0 focus:ring-0" />
+                <span className="text-xs font-bold text-[#1A1A1A] group-hover:text-[#C1121F] transition-colors uppercase tracking-widest">Upcoming</span>
               </label>
             </div>
           </div>
@@ -158,20 +155,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
           </div>
         </div>
 
-        {/* Fabric & Care */}
-        <div className="bg-white rounded-2xl p-6 border border-[#DDD8CE] shadow-sm space-y-4">
-          <h2 className="text-lg font-bold text-[#1A1A1A] border-b border-[#DDD8CE] pb-2">Fabric & Care</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-[#8B8580] mb-1.5 block">Fabric Details</label>
-              <input name="fabric" value={formData.fabric} onChange={handleChange} placeholder="e.g. 100% Cotton" className="w-full px-4 py-2.5 bg-[#FAF7F2] rounded-xl border border-[#DDD8CE] text-sm focus:outline-none focus:border-[#C1121F]" />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-[#8B8580] mb-1.5 block">Care Instructions</label>
-              <input name="care" value={formData.care} onChange={handleChange} placeholder="e.g. Machine wash cold" className="w-full px-4 py-2.5 bg-[#FAF7F2] rounded-xl border border-[#DDD8CE] text-sm focus:outline-none focus:border-[#C1121F]" />
-            </div>
-          </div>
-        </div>
+
 
         {/* Inventory */}
         <div className="bg-white rounded-2xl p-6 border border-[#DDD8CE] shadow-sm space-y-4">

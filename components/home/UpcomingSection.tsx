@@ -24,10 +24,30 @@ function useCountdown(target: Date) {
   return time;
 }
 
-export default function UpcomingSection() {
-  const dropDate = new Date("2026-05-15T00:00:00");
+interface UpcomingSectionProps {
+  settings?: {
+    showUpcoming: boolean;
+    upcomingTitle: string;
+    upcomingDescription: string;
+    upcomingDate: string;
+  };
+}
+
+export default function UpcomingSection({ settings }: UpcomingSectionProps) {
+  const [mounted, setMounted] = useState(false);
+  const dropDate = new Date(settings?.upcomingDate || "2026-05-15T00:00:00");
   const countdown = useCountdown(dropDate);
   const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!settings?.showUpcoming) {
+    return null;
+  }
+
+  const displayTime = mounted ? countdown : { d: 0, h: 0, m: 0, s: 0 };
 
   return (
     <section className="relative py-32 bg-brand-charcoal overflow-hidden group">
@@ -58,18 +78,16 @@ export default function UpcomingSection() {
               <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-brand-yellow/10 border border-brand-yellow/20 backdrop-blur-md mb-8">
                  <Timer className="w-4 h-4 text-brand-yellow animate-pulse" />
                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-yellow">
-                   Dropping May 15
+                   Dropping {dropDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                  </span>
               </div>
               
-              <h2 className="text-6xl lg:text-8xl font-black text-white leading-[0.9] mb-10 tracking-tighter">
-                THE <br />
-                <span className="text-brand-red italic font-serif">MIDNIGHT</span> <br />
-                SYNDICATE
+              <h2 className="text-6xl lg:text-7xl font-black text-white leading-[0.9] mb-10 tracking-tighter uppercase whitespace-pre-line">
+                {settings.upcomingTitle}
               </h2>
               
-              <p className="text-white/40 text-xl font-medium leading-relaxed max-w-lg mb-14 mx-auto lg:mx-0">
-                Our most experimental collection yet. Conceptual silhouettes fused with urban performance materials.
+              <p className="text-white/40 text-xl font-medium leading-relaxed max-w-lg mb-14 mx-auto lg:mx-0 whitespace-pre-line">
+                {settings.upcomingDescription}
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-4 max-w-md mx-auto lg:mx-0">
@@ -98,10 +116,10 @@ export default function UpcomingSection() {
           <div className="lg:w-1/2">
              <div className="grid grid-cols-2 gap-6">
                 {[
-                  { val: countdown.d, label: "Days" },
-                  { val: countdown.h, label: "Hours" },
-                  { val: countdown.m, label: "Mins" },
-                  { val: countdown.s, label: "Secs" },
+                  { val: displayTime.d, label: "Days" },
+                  { val: displayTime.h, label: "Hours" },
+                  { val: displayTime.m, label: "Mins" },
+                  { val: displayTime.s, label: "Secs" },
                 ].map((item, i) => (
                   <motion.div
                     key={item.label}

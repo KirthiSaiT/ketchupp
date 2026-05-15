@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
 import { ChevronDown, Filter, X, ArrowUpRight, SlidersHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard, { Product } from "@/components/products/ProductCard";
@@ -73,14 +74,34 @@ export default function CollectionClient({ categorySlug, initialSearch }: Collec
   const currentCategory = categories.find(c => c.slug === activeCategory);
   const categoryTitle = currentCategory?.name || (activeCategory === "all" ? "The Archive" : activeCategory);
 
+  const headerImage = useMemo(() => {
+    if (!currentCategory) return null;
+    const s = (currentCategory.slug || "").toLowerCase();
+    const n = (currentCategory.name || "").toLowerCase();
+    if (s === "tops" || n === "tops") return "/ketchuptop_new.webp";
+    if (s === "jackets" || n === "jackets") return "/ketchupjacket.webp";
+    if (s === "bottoms" || n === "bottoms") return "/ketchupbottom.webp";
+    if (s === "shoes" || n === "shoes") return "/shoesketchup.webp";
+    if (s === "accessories" || n === "accessories") return "/accessoriesketchup.webp";
+    return currentCategory.image;
+  }, [currentCategory]);
+
   return (
     <div className="bg-brand-cream min-h-screen">
       {/* ── Header Experience ── */}
       <section className="relative h-[60vh] flex flex-col justify-end pb-24 overflow-hidden bg-brand-charcoal">
         {/* Background Image / Ambient Glow */}
         <div className="absolute inset-0 z-0">
-          {currentCategory?.image ? (
-             <img src={currentCategory.image} alt={categoryTitle} className="w-full h-full object-cover opacity-40 grayscale" />
+          {headerImage ? (
+             <Image 
+               src={headerImage} 
+               alt={categoryTitle} 
+               fill 
+               className="object-cover opacity-40 grayscale" 
+               priority
+               quality={90}
+               sizes="100vw"
+             />
           ) : (
             <div className="w-full h-full bg-brand-charcoal" />
           )}

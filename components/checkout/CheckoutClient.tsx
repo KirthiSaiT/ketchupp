@@ -14,6 +14,7 @@ import { createOrder } from "@/lib/actions/order.action";
 
 export default function CheckoutClient() {
   const router = useRouter();
+  const { user } = useUser();
   const { items, total, itemCount, clearCart } = useCart();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -48,8 +49,6 @@ export default function CheckoutClient() {
     setStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-
-  const { user } = useUser();
 
   async function handlePayment() {
     setIsProcessing(true);

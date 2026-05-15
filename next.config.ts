@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "drive.usercontent.google.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],
+    qualities: [75, 80, 90],
   },
 };
 

@@ -19,6 +19,17 @@ interface CategorySectionProps {
 }
 
 function CategoryCard({ category, index, className, titleSize = "text-3xl" }: { category: Category, index: number, className?: string, titleSize?: string }) {
+  const imageSrc = (() => {
+    const s = category.slug.toLowerCase();
+    const n = category.name.toLowerCase();
+    if (s === "tops" || n === "tops") return "/ketchuptop_new.webp";
+    if (s === "jackets" || n === "jackets") return "/ketchupjacket.webp";
+    if (s === "bottoms" || n === "bottoms") return "/ketchupbottom.webp";
+    if (s === "shoes" || n === "shoes") return "/shoesketchup.webp";
+    if (s === "accessories" || n === "accessories") return "/accessoriesketchup.webp";
+    return category.image;
+  })();
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
@@ -30,10 +41,16 @@ function CategoryCard({ category, index, className, titleSize = "text-3xl" }: { 
       <Link href={`/collections/${category.slug}`} className="block h-full w-full">
         <div className="relative h-full w-full overflow-hidden">
           <Image
-            src={category.image}
+            src={imageSrc}
             alt={category.name}
             fill
-            className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110 grayscale hover:grayscale-0"
+            sizes="(max-width: 1024px) 100vw, (max-width: 1600px) 33vw, 500px"
+            className={cn(
+              "object-cover transition-transform duration-1000 ease-out group-hover:scale-110",
+              imageSrc.startsWith("/") ? "" : "grayscale hover:grayscale-0"
+            )}
+            quality={imageSrc.startsWith("/") ? 100 : 80}
+            priority={imageSrc.startsWith("/")}
           />
           
           <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal/90 via-brand-charcoal/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />

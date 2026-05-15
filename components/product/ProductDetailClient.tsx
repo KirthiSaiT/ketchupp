@@ -27,7 +27,7 @@ const REVIEWS = [
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { addItem } = useCart();
   const { toggle, isFav } = useFavourites();
-  const fav = isFav(product.id);
+  const fav = isFav(product._id || product.id);
 
   const [activeImg, setActiveImg] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -49,8 +49,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       toast.error("Please select a size to continue");
       return;
     }
-    addItem({
-      id: product.id,
+    const selectedSizeData = product.sizes?.find(s => s.name === selectedSize);
+
+    const success = addItem({
+      id: product._id || product.id,
       name: product.name,
       price: product.price,
       image: product.image || (product.images?.[0] ?? ""),
@@ -58,8 +60,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       color: product.colors?.[0] || "Standard",
       quantity,
       slug: product.slug,
+      maxStock: selectedSizeData?.stock ?? 99,
     });
-    toast.success(`${product.name} added to your bag!`);
+
+    if (success) {
+      toast.success(`${product.name} added to your bag!`);
+    }
   }
 
   const images = product.images || [product.image];
@@ -91,13 +97,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               className="relative aspect-square bg-[#EDE8E0] rounded-3xl overflow-hidden cursor-zoom-in group"
               onClick={() => setZoom(true)}
             >
-              <Image
-                src={images[activeImg] || "/placeholder-product.png"}
-                alt={product.name}
-                fill
-                priority
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+                <Image
+                  src={images[activeImg] || "/placeholder-product.png"}
+                  alt={product.name}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  quality={90}
+                />
               {product.badge && (
                 <div className="absolute top-4 left-4 z-10">
                   <Badge className="bg-[#FFD60A] text-[#1A1A1A] font-bold px-3 py-1">
@@ -120,7 +128,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       activeImg === i ? "border-[#C1121F]" : "border-transparent"
                     }`}
                   >
-                    <Image src={img} alt={`View ${i + 1}`} fill className="object-cover" />
+                    <Image 
+                      src={img} 
+                      alt={`View ${i + 1}`} 
+                      fill 
+                      sizes="80px"
+                      className="object-cover" 
+                      quality={60}
+                    />
                   </button>
                 ))}
               </div>
@@ -223,8 +238,19 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   {quantity}
                 </span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="w-11 h-11 flex items-center justify-center hover:bg-[#EDE8E0] transition-colors"
+                  onClick={() => {
+                    const selectedSizeData = product.sizes?.find(s => s.name === selectedSize);
+                    const stock = selectedSizeData?.stock ?? 99;
+                    if (quantity < stock) {
+                      setQuantity(quantity + 1);
+                    }
+                  }}
+                  disabled={(() => {
+                    const selectedSizeData = product.sizes?.find(s => s.name === selectedSize);
+                    const stock = selectedSizeData?.stock ?? 99;
+                    return quantity >= stock;
+                  })()}
+                  className="w-11 h-11 flex items-center justify-center hover:bg-[#EDE8E0] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <Plus className="w-4 h-4 text-[#1A1A1A]" />
                 </button>
@@ -261,20 +287,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </button>
             </div>
 
-            {/* Delivery Perks */}
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { icon: <Truck className="w-4 h-4" />, label: "Free Delivery", sub: "On orders \u20b9999+" },
-                { icon: <RotateCcw className="w-4 h-4" />, label: "Easy Returns", sub: "7-day policy" },
-                { icon: <Shield className="w-4 h-4" />, label: "Secure Pay", sub: "100% safe checkout" },
-              ].map((perk) => (
-                <div key={perk.label} className="bg-white rounded-2xl p-3 text-center border border-[#DDD8CE]">
-                  <div className="flex justify-center text-[#C1121F] mb-1">{perk.icon}</div>
-                  <p className="text-[10px] font-bold text-[#1A1A1A]">{perk.label}</p>
-                  <p className="text-[10px] text-[#8B8580]">{perk.sub}</p>
-                </div>
-              ))}
-            </div>
+
 
             {/* Accordions */}
             <Accordion type="single" collapsible className="space-y-2">

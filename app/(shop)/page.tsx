@@ -17,12 +17,14 @@ import NewsletterSection from "@/components/home/NewsletterSection";
 export default function HomePage() {
   const [dbBestsellers, setDbBestsellers] = useState<any[]>([]);
   const [dbCategories, setDbCategories] = useState<any[]>([]);
+  const [storeSettings, setStoreSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       getBestsellers().then(res => setDbBestsellers(res)),
-      getCategories().then(res => setDbCategories(res))
+      getCategories().then(res => setDbCategories(res)),
+      import("@/lib/actions/settings.action").then(m => m.getStoreSettings()).then(res => setStoreSettings(res))
     ]).finally(() => setLoading(false));
   }, []);
 
@@ -41,7 +43,7 @@ export default function HomePage() {
       <BestsellerSection products={dbBestsellers} />
 
       {/* 5. Limited Drop Teaser */}
-      <UpcomingSection />
+      <UpcomingSection settings={storeSettings} />
 
       {/* 6. Social Proof / Community */}
       <TestimonialSection />
