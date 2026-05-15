@@ -99,7 +99,7 @@ export async function createProduct(data: any) {
   }
 }
 
-export async function updateProduct(id: string, data: Partial<Product>) {
+export async function updateProduct(id: string, data: any) {
   try {
     await connectDB();
     const updated = await Product.findByIdAndUpdate(id, data, { new: true }).lean();

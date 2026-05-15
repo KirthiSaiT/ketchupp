@@ -13,7 +13,7 @@ export async function createOrder(orderData: any) {
     const emailRes = await sendOrderConfirmationEmail({
       orderId: order._id.toString(),
       customerName: order.shipping.name,
-      customerEmail: orderData.userEmail || order.shipping.email || "customer@example.com",
+      customerEmail: orderData.userEmail || "customer@example.com",
       total: order.total,
       items: order.items,
       shippingAddress: order.shipping
