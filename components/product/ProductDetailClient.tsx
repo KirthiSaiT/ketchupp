@@ -309,7 +309,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <AccordionItem value="shipping" className="bg-white rounded-2xl border border-[#DDD8CE] px-5">
                 <AccordionTrigger className="text-sm font-semibold text-[#1A1A1A] hover:no-underline py-4">Shipping & Returns</AccordionTrigger>
                 <AccordionContent className="text-sm text-[#8B8580] pb-4 leading-relaxed whitespace-pre-line">
-                  Standard delivery in 3\u20135 working days. Express delivery available. Free shipping on orders above \u20b9999. Post office delivery supported across India.
+                  Free shipping on all orders. Delivery handled securely via India Post (Post Office Delivery) within 3\u20137 working days across India.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="refund" className="bg-white rounded-2xl border border-[#DDD8CE] px-5">

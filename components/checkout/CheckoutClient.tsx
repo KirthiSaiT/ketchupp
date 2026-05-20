@@ -21,13 +21,13 @@ export default function CheckoutClient() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const shipping = total >= 999 ? 0 : 99;
-  const grandTotal = total + shipping;
+  const shipping = 0;
+  const grandTotal = total;
 
   const [shippingData, setShippingData] = useState({
     firstName: "", lastName: "", email: "", phone: "",
     address: "", city: "", state: "", pincode: "",
-    deliveryType: "home",
+    deliveryType: "post-office",
   });
 
   const [paymentMethod, setPaymentMethod] = useState("upi");
@@ -303,28 +303,16 @@ export default function CheckoutClient() {
                     <div className="mt-4 pt-4 border-t border-[#DDD8CE]">
                       <label className="text-xs font-semibold text-[#8B8580] uppercase tracking-wide mb-3 flex items-center gap-1">
                         Delivery Method
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger><HelpCircle className="w-3 h-3" /></TooltipTrigger>
-                            <TooltipContent>We ship everywhere in India, including rural post offices.</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
                       </label>
-                      <div className="grid grid-cols-2 gap-3">
-                        <label className={`cursor-pointer border rounded-xl p-4 flex items-center gap-3 transition-colors ${shippingData.deliveryType === 'home' ? 'border-[#C1121F] bg-[#C1121F]/5' : 'border-[#DDD8CE] hover:border-[#1A1A1A]'}`}>
-                          <input type="radio" className="accent-[#C1121F]" name="delivery" value="home" checked={shippingData.deliveryType === 'home'} onChange={(e) => setShippingData({...shippingData, deliveryType: e.target.value})} />
-                          <div className="flex flex-col">
-                            <span className="text-sm font-bold text-[#1A1A1A]">Standard Delivery</span>
-                            <span className="text-xs text-[#8B8580]">3-5 Business Days</span>
-                          </div>
-                        </label>
-                        <label className={`cursor-pointer border rounded-xl p-4 flex items-center gap-3 transition-colors ${shippingData.deliveryType === 'post-office' ? 'border-[#C1121F] bg-[#C1121F]/5' : 'border-[#DDD8CE] hover:border-[#1A1A1A]'}`}>
-                          <input type="radio" className="accent-[#C1121F]" name="delivery" value="post-office" checked={shippingData.deliveryType === 'post-office'} onChange={(e) => setShippingData({...shippingData, deliveryType: e.target.value})} />
-                          <div className="flex flex-col">
-                            <span className="text-sm font-bold text-[#1A1A1A]">Post Office Delivery</span>
-                            <span className="text-xs text-[#8B8580]">India Post (PO Box)</span>
-                          </div>
-                        </label>
+                      <div className="border border-[#C1121F] bg-[#C1121F]/5 rounded-xl p-4 flex items-center gap-3">
+                        <input type="radio" className="accent-[#C1121F] w-4 h-4" checked readOnly />
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-[#1A1A1A] flex items-center gap-1.5">
+                            Post Office Delivery
+                            <span className="bg-[#C1121F] text-white text-[8px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider">India Post</span>
+                          </span>
+                          <span className="text-xs text-[#8B8580] mt-0.5">Secure delivery across India (3–7 working days)</span>
+                        </div>
                       </div>
                     </div>
 
@@ -408,7 +396,7 @@ export default function CheckoutClient() {
                   </div>
                   <div className="flex justify-between text-sm text-[#8B8580]">
                     <span>Shipping</span>
-                    <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
+                    <span>FREE</span>
                   </div>
                 </div>
 
