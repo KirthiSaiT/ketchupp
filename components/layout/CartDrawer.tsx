@@ -17,8 +17,8 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { items, removeItem, updateQty, total, itemCount } = useCart();
-  const shipping = total >= 999 ? 0 : 99;
-  const grandTotal = total + shipping;
+  const shipping = 0;
+  const grandTotal = total;
 
   return (
     <Sheet open={open} onOpenChange={(o: boolean) => !o && onClose()}>
@@ -135,15 +135,10 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                 </div>
                 <div className="flex justify-between text-sm text-[#8B8580]">
                   <span>Shipping</span>
-                  <span className={cn(shipping === 0 && "text-green-600 font-semibold")}>
-                    {shipping === 0 ? "FREE" : `₹${shipping}`}
+                  <span className="text-green-600 font-semibold">
+                    FREE
                   </span>
                 </div>
-                {shipping > 0 && (
-                  <p className="text-xs text-[#8B8580]">
-                    Free shipping on orders above ₹999
-                  </p>
-                )}
                 <Separator className="bg-[#DDD8CE]" />
                 <div className="flex justify-between font-bold text-[#1A1A1A]">
                   <span>Total</span>

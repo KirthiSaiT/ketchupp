@@ -11,8 +11,8 @@ import { toast } from "sonner";
 
 export default function CartClient() {
   const { items, removeItem, updateQty, total, itemCount, clearCart } = useCart();
-  const shipping = total >= 999 ? 0 : 99;
-  const grandTotal = total + shipping;
+  const shipping = 0;
+  const grandTotal = total;
 
   if (items.length === 0) {
     return (
@@ -151,15 +151,10 @@ export default function CartClient() {
                 </div>
                 <div className="flex justify-between text-sm text-[#8B8580]">
                   <span>Shipping</span>
-                  <span className={shipping === 0 ? "text-green-600 font-semibold" : ""}>
-                    {shipping === 0 ? "FREE" : `₹${shipping}`}
+                  <span className="text-green-600 font-semibold">
+                    FREE
                   </span>
                 </div>
-                {shipping > 0 && (
-                  <p className="text-xs text-[#C1121F] bg-[#C1121F]/5 rounded-lg px-3 py-2">
-                    Add ₹{(999 - total).toLocaleString("en-IN")} more for free shipping!
-                  </p>
-                )}
               </div>
 
               <Separator className="bg-[#DDD8CE] mb-4" />
