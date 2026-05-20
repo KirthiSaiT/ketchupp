@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useUser } from "@clerk/nextjs";
 import { createOrder } from "@/lib/actions/order.action";
+import { initiateRazorpayOrder, verifyRazorpaySignature } from "@/lib/actions/razorpay.action";
+import Script from "next/script";
 
 export default function CheckoutClient() {
   const router = useRouter();
@@ -55,6 +57,7 @@ export default function CheckoutClient() {
     try {
       const orderData = {
         userId: user?.id || "guest",
+        userEmail: shippingData.email,
         items: items.map(i => ({
           productId: i.id,
           name: i.name,
@@ -75,7 +78,7 @@ export default function CheckoutClient() {
         },
         payment: {
           method: paymentMethod,
-          status: "paid"
+          status: paymentMethod === "cod" ? "pending" : "paid"
         },
         status: "processing",
         subtotal: total,
@@ -83,18 +86,102 @@ export default function CheckoutClient() {
         total: grandTotal
       };
 
-      const res = await createOrder(orderData);
-      
-      if (res.success) {
-        setStep(3);
-        clearCart();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        toast.error("Failed to create order: " + res.error);
+      if (paymentMethod === "cod") {
+        const res = await createOrder(orderData);
+        if (res.success) {
+          setStep(3);
+          clearCart();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          toast.error("Failed to create order: " + res.error);
+        }
+        setIsProcessing(false);
+        return;
       }
+
+      // Razorpay checkout integration
+      if (!(window as any).Razorpay) {
+        toast.error("Payment gateway is still loading. Please try again in a few seconds.");
+        setIsProcessing(false);
+        return;
+      }
+
+      const initRes = await initiateRazorpayOrder(grandTotal);
+      if (!initRes.success) {
+        toast.error(initRes.error || "Failed to initiate payment. Please try again.");
+        setIsProcessing(false);
+        return;
+      }
+
+      const options = {
+        key: initRes.keyId,
+        amount: initRes.amount,
+        currency: initRes.currency,
+        name: "KETCHUPP",
+        description: "Secure Archival Purchase",
+        image: "/ketchupptop.webp",
+        order_id: initRes.orderId,
+        handler: async function (response: any) {
+          setIsProcessing(true);
+          try {
+            // Server-side cryptographic HMAC validation
+            const verifyRes = await verifyRazorpaySignature(
+              response.razorpay_order_id,
+              response.razorpay_payment_id,
+              response.razorpay_signature
+            );
+
+            if (!verifyRes.success) {
+              toast.error("Cryptographic signature mismatch! Order security validation failed.");
+              setIsProcessing(false);
+              return;
+            }
+
+            // Save verified order into database
+            const finalOrderData = {
+              ...orderData,
+              payment: {
+                method: paymentMethod,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                status: "paid" as const
+              }
+            };
+
+            const dbRes = await createOrder(finalOrderData);
+            if (dbRes.success) {
+              setStep(3);
+              clearCart();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+              toast.error("Payment verified successfully, but order placement failed: " + dbRes.error);
+            }
+          } catch (err: any) {
+            toast.error("An error occurred during payment verification: " + err.message);
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: `${shippingData.firstName} ${shippingData.lastName}`.trim(),
+          email: shippingData.email,
+          contact: shippingData.phone,
+        },
+        theme: {
+          color: "#C1121F",
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+            toast("Payment cancelled.");
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
     } catch (e: any) {
       toast.error("An error occurred: " + e.message);
-    } finally {
       setIsProcessing(false);
     }
   }
@@ -126,6 +213,10 @@ export default function CheckoutClient() {
 
   return (
     <div className="bg-[#FAF7F2] min-h-screen pb-20">
+      <Script 
+        src="https://checkout.razorpay.com/v1/checkout.js" 
+        strategy="lazyOnload" 
+      />
       <div className="bg-[#1A1A1A] py-14 mb-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl lg:text-4xl font-bold text-[#FAF7F2]" style={{ fontFamily: "var(--font-playfair)" }}>
@@ -273,8 +364,11 @@ export default function CheckoutClient() {
                     ))}
                   </div>
 
-                  <div className="bg-blue-50 text-blue-800 text-xs p-4 rounded-xl mb-6">
-                    <strong>Note:</strong> Since this is a demo, clicking "Pay Now" will mock a successful transaction. Razorpay keys are pending.
+                  <div className="bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs p-4 rounded-xl mb-6 flex items-start gap-2">
+                    <Lock className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong>Secure Gateway:</strong> Payments are processed via Razorpay. Your credentials and transaction data are fully encrypted (SSL 256-bit).
+                    </div>
                   </div>
 
                   <Button onClick={handlePayment} disabled={isProcessing} className="w-full bg-[#FFD60A] hover:bg-[#e6c000] text-[#1A1A1A] rounded-xl py-6 font-bold text-base flex items-center justify-center gap-2">

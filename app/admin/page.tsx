@@ -10,6 +10,10 @@ export default async function AdminDashboardPage() {
   const productCount = await Product.countDocuments();
   const orderCount = await Order.countDocuments();
   
+  // Calculate total revenue from successful/paid orders
+  const paidOrders = await Order.find({ "payment.status": "paid" }).lean();
+  const totalRevenue = paidOrders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
+  
   const pendingOrders = await Order.find({ status: "processing" }).sort({ createdAt: -1 }).limit(5).lean();
 
   // Fetch products with low stock (<= 3 units in any size)
@@ -50,7 +54,7 @@ export default async function AdminDashboardPage() {
           </div>
           <div>
             <p className="text-sm font-semibold text-[#8B8580]">Revenue Tracker</p>
-            <p className="text-xs text-green-700 font-bold mt-1">Pending Sync</p>
+            <p className="text-2xl font-bold text-green-700">₹{totalRevenue.toLocaleString("en-IN")}</p>
           </div>
         </div>
       </div>

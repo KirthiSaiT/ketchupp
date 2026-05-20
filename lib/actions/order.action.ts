@@ -36,3 +36,14 @@ export async function getUserOrders(userId: string) {
     return [];
   }
 }
+
+export async function updateOrderStatus(orderId: string, status: string) {
+  try {
+    await connectDB();
+    await Order.findByIdAndUpdate(orderId, { status });
+    return { success: true };
+  } catch (error: any) {
+    console.error("Failed to update order status:", error);
+    return { success: false, error: error.message };
+  }
+}

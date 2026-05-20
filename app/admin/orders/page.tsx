@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/db";
 import { Order } from "@/lib/models/Order";
 import { Badge } from "@/components/ui/badge";
+import OrderStatusSelect from "@/components/admin/OrderStatusSelect";
 
 export default async function AdminOrdersPage() {
   await connectDB();
@@ -48,16 +49,10 @@ export default async function AdminOrdersPage() {
                   </td>
                   <td className="px-6 py-4 text-[#1A1A1A] font-bold text-sm">₹{order.total.toLocaleString("en-IN")}</td>
                   <td className="px-6 py-4">
-                    <select 
-                       defaultValue={order.status}
-                       className="bg-[#EDE8E0] text-xs font-bold text-[#1A1A1A] rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#C1121F]"
-                     >
-                       <option value="processing">Processing</option>
-                       <option value="shipped">Shipped</option>
-                       <option value="out-for-delivery">Out for Delivery</option>
-                       <option value="delivered">Delivered</option>
-                       <option value="cancelled">Cancelled</option>
-                    </select>
+                    <OrderStatusSelect 
+                      orderId={order._id.toString()} 
+                      initialStatus={order.status} 
+                    />
                   </td>
                   <td className="px-6 py-4 text-right">
                      <button className="text-xs font-bold text-[#C1121F] hover:underline">View Invoice</button>
