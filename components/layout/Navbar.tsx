@@ -116,7 +116,17 @@ export default function Navbar() {
 
               {/* Account */}
               {isLoaded && isSignedIn ? (
-                <UserButton appearance={{ elements: { avatarBox: "w-8 h-8" } }} />
+                <div className="flex items-center gap-1.5">
+                  <Link 
+                    href="/account/orders" 
+                    className="p-2 rounded-full hover:bg-[#EDE8E0] transition-colors text-xs font-bold uppercase tracking-wider text-[#1A1A1A] flex items-center gap-1.5"
+                    title="View My Orders"
+                  >
+                    <User className="w-5 h-5 text-[#1A1A1A]" />
+                    <span className="hidden sm:inline">My Orders</span>
+                  </Link>
+                  <UserButton appearance={{ elements: { avatarBox: "w-8.5 h-8.5" } }} />
+                </div>
               ) : (
                 <Link href="/sign-in" className="p-2 rounded-full hover:bg-[#EDE8E0] transition-colors">
                   <User className="w-5 h-5 text-[#1A1A1A]" />
@@ -183,6 +193,15 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              {isSignedIn && (
+                <Link
+                  href="/account/orders"
+                  onClick={() => setMobileOpen(false)}
+                  className="text-lg font-semibold text-[#C1121F] border-t border-[#DDD8CE] pt-4 mt-2 flex items-center gap-2"
+                >
+                  <User className="w-5 h-5" /> My Orders
+                </Link>
+              )}
             </nav>
           </div>
         )}
